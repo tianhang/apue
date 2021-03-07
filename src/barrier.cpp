@@ -21,6 +21,7 @@ std::vector<long>sv;
 void * thf(void *arg){
 
 	long idx = (long)arg;
+	std::cout<<idx<<"\n";
 //
 //	heapsort
 	std::vector<long> v(idx,idx+TNUM-1);
@@ -28,6 +29,7 @@ void * thf(void *arg){
 	std::sort_heap(v.begin(),v.end());
 	vl.push_back(v);
 	pthread_barrier_wait(&b);
+	//std::cout<<vl.size()<<"\n";
 
 	return (void*)(0);
 }
@@ -50,15 +52,19 @@ void merge(){
 		for(int i=0;i<vl.size();i++){
 		//	std::vector<long> v = vl[i].
 			int val = vl[i][idx_arr[i]]; 
-	//	long min_n = LONG_MAX; 
+		//	long min_n = LONG_MAX; 
+			std::cout<<i<<" i arr ";
+			std::cout<<idx_arr[i]<<" idx arr \n";
+			std::cout<<"size:"<<vl[i].size()<<"\n";
 			std::cout<<val<<"\n";
 			if(val < min_n){
-				sv.push_back(val);	
 				min_n = val;
-				idx_arr[i]++;
+				if(idx_arr[i] < TNUM)
+					idx_arr[i]++;
 				std::cout<<val<<"\n";
 				if(idx_arr[i] == NUMNUM) cnt++;
 			}
+			sv.push_back(min_n);	
 		}
 	}
 }
