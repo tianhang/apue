@@ -7,9 +7,10 @@
 #include<limits.h>
 
 #define NTHR 8
-#define NUMNUM 800L
+#define NUMNUM 80L
 #define TNUM	(NUMNUM/NTHR) 
 
+pthread_mutex_t LOCK = PTHREAD_MUTEX_INITIALIZER;
 
 long num[NUMNUM];
 
@@ -21,13 +22,20 @@ std::vector<long>sv;
 void * thf(void *arg){
 
 	long idx = (long)arg;
-	std::cout<<idx<<"\n";
+//	std::cout<<"idx arg :"<<idx<<"\n";
 //
 //	heapsort
-	std::vector<long> v(idx,idx+TNUM-1);
+	std::vector<long> v(num+idx,num+idx+TNUM);
 	std::make_heap(v.begin(),v.end());
 	std::sort_heap(v.begin(),v.end());
+
+
+	pthread_mutex_lock(&LOCK);
 	vl.push_back(v);
+	pthread_mutex_unlock(&LOCK);
+
+	//std::cout<<"v size :"<<v.size()<<"\n";
+
 	pthread_barrier_wait(&b);
 	//std::cout<<vl.size()<<"\n";
 
@@ -43,29 +51,39 @@ void data_init(){
 }
 
 void merge(){
-	int idx_arr[TNUM];
+	int idx_arr[NTHR];
 	memset(&idx_arr,0,sizeof(idx_arr));
-	long min_n = LONG_MAX; 
 	int cnt =0;
-	while(cnt < TNUM){
-	
+	while(cnt < NTHR){
+			
+		long min_n = LONG_MAX; 
+		int min_n_idx = -1 ;
+		std::cout<<"cnt:"<<cnt<<"\n";
 		for(int i=0;i<vl.size();i++){
 		//	std::vector<long> v = vl[i].
-			int val = vl[i][idx_arr[i]]; 
+			if(idx_arr[i] == TNUM) continue;
+			long val = vl[i][idx_arr[i]]; 
 		//	long min_n = LONG_MAX; 
-			std::cout<<i<<" i arr ";
-			std::cout<<idx_arr[i]<<" idx arr \n";
-			std::cout<<"size:"<<vl[i].size()<<"\n";
-			std::cout<<val<<"\n";
+		//	std::cout<<val<<"\n";
 			if(val < min_n){
 				min_n = val;
-				if(idx_arr[i] < TNUM)
-					idx_arr[i]++;
-				std::cout<<val<<"\n";
-				if(idx_arr[i] == NUMNUM) cnt++;
+				min_n_idx = i;
 			}
-			sv.push_back(min_n);	
 		}
+
+
+
+		if(idx_arr[min_n_idx] == TNUM-1){
+
+			cnt++;
+		}
+
+		idx_arr[min_n_idx]++;
+
+		std::cout<<min_n<<" - min n \n";
+			
+		sv.push_back(min_n);	
+		
 	}
 }
 int main(){
@@ -81,7 +99,7 @@ int main(){
 	pthread_barrier_wait(&b);
 	std::cout<<"----barrier line-----"<<"\n";
 	merge();
-	std::cout<<sv.size()<<"\n";
+	std::cout<<"sv size :"<<sv.size()<<"\n";
 	// wait
 	//
 	// merge
