@@ -7,7 +7,7 @@
 #include<limits.h>
 
 #define NTHR 8
-#define NUMNUM 80L
+#define NUMNUM 8000000L
 #define TNUM	(NUMNUM/NTHR) 
 
 pthread_mutex_t LOCK = PTHREAD_MUTEX_INITIALIZER;
@@ -58,7 +58,7 @@ void merge(){
 			
 		long min_n = LONG_MAX; 
 		int min_n_idx = -1 ;
-		std::cout<<"cnt:"<<cnt<<"\n";
+	//	std::cout<<"cnt:"<<cnt<<"\n";
 		for(int i=0;i<vl.size();i++){
 		//	std::vector<long> v = vl[i].
 			if(idx_arr[i] == TNUM) continue;
@@ -80,8 +80,6 @@ void merge(){
 
 		idx_arr[min_n_idx]++;
 
-		std::cout<<min_n<<" - min n \n";
-			
 		sv.push_back(min_n);	
 		
 	}
@@ -100,11 +98,12 @@ int main(){
 	std::cout<<"----barrier line-----"<<"\n";
 	merge();
 	std::cout<<"sv size :"<<sv.size()<<"\n";
-	// wait
-	//
-	// merge
-	//
-	//show comsumed time
+	
+	for(int i=0;i<sv.size();i++){
+
+		std::cout<<sv[i]<<"\n";
+	}
+		std::cout<<"\n";
 	return 0;
 }
 
